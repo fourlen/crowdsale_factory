@@ -30,13 +30,6 @@ contract Crowdsale is ICrowdsale, ReentrancyGuard {
     mapping(address => uint256) public userPurchasedTokens;
     mapping(IStake.Levels => uint256) public levelPoolAccess; //percents (for exmaple Iron level can buy only 5% of pool)
 
-    constructor(IUniswapV2Router02 _router, address _factory) {
-        require(address(_router) != address(0), "Router address can't be 0");
-        require(address(_factory) != address(0), "Factory address can't be 0");
-        router = _router;
-        factory = _factory;
-    }
-
     modifier onlyFactory() {
         require(msg.sender == factory, "Initialize method is only for factory");
         _;
@@ -45,6 +38,13 @@ contract Crowdsale is ICrowdsale, ReentrancyGuard {
     modifier onlyOwner() {
         require(msg.sender == owner, "Method allowed only for owner");
         _;
+    }
+
+    constructor(IUniswapV2Router02 _router, address _factory) {
+        require(address(_router) != address(0), "Router address can't be 0");
+        require(address(_factory) != address(0), "Factory address can't be 0");
+        router = _router;
+        factory = _factory;
     }
 
     function initialize(
