@@ -19,6 +19,7 @@ contract CrowdsaleFactory is Ownable, ReentrancyGuard {
             address(_exampleCrowdsale) != address(0),
             "example address can't be 0"
         );
+        require(exampleCrowdsale == address(0), "example already initialized");
         exampleCrowdsale = _exampleCrowdsale;
     }
 
