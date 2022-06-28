@@ -32,10 +32,13 @@ contract CrowdsaleFactory is Ownable, ReentrancyGuard {
         uint256 _price,
         uint256[5] memory _levelPoolPercent //from platinum to iron
     ) external nonReentrant returns (Crowdsale newCrowdsale) {
-        require(address(exampleCrowdsale) != address(0), "Example isn't initialized");
+        require(
+            address(exampleCrowdsale) != address(0),
+            "Example isn't initialized"
+        );
         address sender = _msgSender();
         newCrowdsale = Crowdsale(Clones.clone(exampleCrowdsale)); //использую не интерфейс, т.к. нужен метод transferOwnership.
-        newCrowdsale.initialize(                                            //не нашел человеческого способа вызвать transferOwnership у интерфейса
+        newCrowdsale.initialize( //не нашел человеческого способа вызвать transferOwnership у интерфейса
             sender,
             _saleToken,
             _paymentToken,

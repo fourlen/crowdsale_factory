@@ -38,10 +38,7 @@ contract Crowdsale is ICrowdsale, ReentrancyGuard {
     }
 
     modifier onlyFactory() {
-        require(
-            msg.sender == factory,
-            "Initialize method is only for factory"
-        );
+        require(msg.sender == factory, "Initialize method is only for factory");
         _;
     }
 

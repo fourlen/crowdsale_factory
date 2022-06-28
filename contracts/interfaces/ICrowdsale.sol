@@ -32,5 +32,4 @@ interface ICrowdsale {
     function claim() external;
 
     function claimForOwner() external;
-
 }
