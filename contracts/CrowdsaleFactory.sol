@@ -6,8 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
-import "./Crowdsale.sol";
-import "hardhat/console.sol";
+import "./interfaces/ICrowdsale.sol";
 
 contract CrowdsaleFactory is Ownable, ReentrancyGuard {
     address public exampleCrowdsale; //not immmutable so we can change realisation of crowdsale
@@ -31,14 +30,14 @@ contract CrowdsaleFactory is Ownable, ReentrancyGuard {
         uint256 _dexTokenPercent,
         uint256 _price,
         uint256[5] memory _levelPoolPercent //from platinum to iron
-    ) external nonReentrant returns (Crowdsale newCrowdsale) {
+    ) external nonReentrant returns (ICrowdsale newCrowdsale) {
         require(
             address(exampleCrowdsale) != address(0),
             "Example isn't initialized"
         );
         address sender = _msgSender();
-        newCrowdsale = Crowdsale(Clones.clone(exampleCrowdsale)); //использую не интерфейс, т.к. нужен метод transferOwnership.
-        newCrowdsale.initialize( //не нашел человеческого способа вызвать transferOwnership у интерфейса
+        newCrowdsale = ICrowdsale(Clones.clone(exampleCrowdsale));
+        newCrowdsale.initialize(
             sender,
             _saleToken,
             _paymentToken,
@@ -48,7 +47,6 @@ contract CrowdsaleFactory is Ownable, ReentrancyGuard {
             _price,
             _levelPoolPercent
         );
-        console.log(address(newCrowdsale));
         SafeERC20.safeTransferFrom(
             _saleToken,
             sender,
