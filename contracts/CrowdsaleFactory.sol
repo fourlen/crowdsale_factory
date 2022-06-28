@@ -11,10 +11,12 @@ import "./interfaces/ICrowdsale.sol";
 contract CrowdsaleFactory is Ownable, ReentrancyGuard {
     address public exampleCrowdsale; //not immmutable so we can change realisation of crowdsale
 
+    mapping(address => ICrowdsale[]) public userCrowdsales;
+
     event CrowdsaleCreated(address creator, address crowdsaleAddress);
 
     //нельзя задать example через конструктор, т.к. в констукторе краудсейла мы указываем фабрику.
-    function setExampleCrowdsale(address _exampleCrowdsale) external {
+    function setExampleCrowdsale(address _exampleCrowdsale) external onlyOwner {
         require(
             address(_exampleCrowdsale) != address(0),
             "example address can't be 0"
@@ -48,6 +50,7 @@ contract CrowdsaleFactory is Ownable, ReentrancyGuard {
             _price,
             _levelPoolPercent
         );
+        userCrowdsales[sender].push(newCrowdsale);
         SafeERC20.safeTransferFrom(
             _saleToken,
             sender,

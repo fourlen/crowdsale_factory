@@ -52,7 +52,8 @@ async function main() {
     await crowdsale.deployed();
 
     console.log(`Crowdsale address: ${crowdsale.address}`);
-
+    
+    await crowdsaleFactory.setExampleCrowdsale(crowdsale.address);
   try {
     await verifyToken(saleTokenTest, "contracts/test/paymentTokenTest.sol:testPayment", utils.parseEther(saleTokenAmount));
     console.log("Verify saleTokenTest succees");
