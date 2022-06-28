@@ -14,14 +14,6 @@ const {
   saleTokenAmount,
   paymentTokenAmount,
   stakeTokenAmount,
-  tokensToSale,
-  percentTokensToDex,
-  price,
-  PlatinumPercentAccess,
-  GoldPercentAccess,
-  SilverPercentAccess,
-  BronzePercentAccess,
-  IronPercentAccess,
   RouterAddess
 } = process.env;
 
@@ -49,9 +41,14 @@ async function main() {
     await stake.deployed();
     console.log("Stake deployed to: ", stake.address);
 
+    const CrowdsaleFactory = await ethers.getContractFactory("CrowdsaleFactory");
+    crowdsaleFactory = await CrowdsaleFactory.deploy();
+    await crowdsaleFactory.deployed();
+
+    console.log(`CrowdsaleFactory address: ${crowdsaleFactory.address}`);
 
     const Crowdsale = await hre.ethers.getContractFactory("Crowdsale");
-    crowdsale = await Crowdsale.deploy(RouterAddess, saleTokenTest.address, paymentTokenTest.address, stake.address, utils.parseEther(tokensToSale), percentTokensToDex, utils.parseEther(price), [PlatinumPercentAccess, GoldPercentAccess, SilverPercentAccess, BronzePercentAccess, IronPercentAccess]);
+    crowdsale = await Crowdsale.deploy(RouterAddess, crowdsaleFactory.address);
     await crowdsale.deployed();
 
     console.log(`Crowdsale address: ${crowdsale.address}`);
@@ -88,10 +85,18 @@ async function main() {
   catch {
     console.log("Verify stake failed");
   }
+  
+  try {
+    await verifyCrowdsaleFactory(crowdsaleFactory);
+    console.log("Verify crowdsaleFactory success");
+  }
+  catch {
+    console.log("Verify crowdsaleFactory failed");
+  }
 
   try {
     await verifyCrowdsale(crowdsale,
-        RouterAddess, saleTokenTest.address, paymentTokenTest.address, stake.address, utils.parseEther(tokensToSale), percentTokensToDex, utils.parseEther(price), [PlatinumPercentAccess, GoldPercentAccess, SilverPercentAccess, BronzePercentAccess, IronPercentAccess]);
+        RouterAddess, crowdsaleFactory.address);
     console.log("Verify crowdsale success");
   }
   catch {
@@ -123,28 +128,25 @@ async function verifyStake(stake,
   })
 }
 
+async function verifyCrowdsaleFactory(
+  crowdsaleFactory
+) {
+await hre.run("verify:verify", {
+  address: crowdsaleFactory.address,
+  constructorArguments: []
+  })
+}
+
 async function verifyCrowdsale(
     crowdsale,
     routerAddess,
-    saleToken,
-    paymentToken,
-    stake,
-    tokensToSale,
-    percentTokensToDex,
-    price,
-    accessess
+    crowdsaleFactoryAddress
 ) {
   await hre.run("verify:verify", {
     address: crowdsale.address,
     constructorArguments: [
         routerAddess,
-        saleToken,
-        paymentToken,
-        stake,
-        tokensToSale,
-        percentTokensToDex,
-        price,
-        accessess
+        crowdsaleFactoryAddress
     ]
   })
 }
